@@ -1,0 +1,33 @@
+<launch>
+
+<!--starting the camera, and output grey scale mono image-->
+	<node name="camera" pkg="usb_cam" type="usb_cam_node">
+		<param name="video_device" value="/dev/video0" />
+		<param name="image_width" value="640" />
+		<param name="image_height" value="480" />
+		<param name="pixel_format" value="yuyv" />
+		<param name="framerate" value="30" />
+		<param name="camera_frame_id" value="webcam" />
+	</node>
+ 
+	<node name="proc" ns="camera" pkg="image_proc" type="image_proc" args="">
+	</node>
+ 
+        <node name="camera_output" pkg="image_view" type="image_view" respawn="false" output="screen">
+                <remap from="image" to="/camera/image_raw"/>
+                <param name="autosize" value="true" />
+        </node>
+
+	<node name="image_proc_output" pkg="image_view" type="image_view" respawn="false" output="screen">
+                <remap from="image" to="/camera/image_mono"/>
+                <param name="autosize" value="true" />
+        </node>
+
+<!--starting camera calibrator-->
+    <node launch-prefix="gdb -ex run --args" name="cameracalibrator" pkg="ptam" type="cameracalibrator" clear_params="true" output="screen">
+	    <remap from="image" to="camera/image_mono" />
+            <remap from="pose" to="pose"/>
+	    <rosparam file="$(find ptam)/PtamFixParams.yaml"/>
+    </node>
+</launch>
+

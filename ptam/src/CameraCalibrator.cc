@@ -113,8 +113,7 @@ void CameraCalibrator::Run()
   bool initialized = false;
   ros::Rate r(100);
   while (!mbDone && ros::ok())
-  {
-
+  {  
     ros::spinOnce();
     r.sleep();
 
@@ -128,6 +127,8 @@ void CameraCalibrator::Run()
       continue;
     }
 
+
+
     // Set up openGL
     mGLWindow->SetupViewport();
     mGLWindow->SetupVideoOrtho();
@@ -140,15 +141,16 @@ void CameraCalibrator::Run()
     {
       GUI.ParseLine("CalibMenu.ShowMenu Live");
       glDrawPixels(mCurrentImage);
+      
       mDoOptimize = true; // set this so that optimization begins when "optimize" is pressed)
 
       if (mNewImage)
       {
         mNewImage = false;
         CalibImage c;
-        if (c.MakeFromImage(mCurrentImage))
+        if (mbGrabNextFrame) // the order of mbGrabNextFrame and c.MakeFromImage(mCurrentImage) is switch to make the program fastter (James)
         {
-          if (mbGrabNextFrame)
+          if (c.MakeFromImage(mCurrentImage))
           {
             mvCalibImgs.push_back(c);
             mvCalibImgs.back().GuessInitialPose(mCamera);
@@ -173,6 +175,7 @@ void CameraCalibrator::Run()
       glDrawPixels(mvCalibImgs[nToShow].mim);
       mvCalibImgs[nToShow].Draw3DGrid(mCamera, true);
     }
+
 
     ostringstream ost;
     ost << "Camera Calibration: Grabbed " << mvCalibImgs.size() << " images." << endl;

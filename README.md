@@ -11,7 +11,7 @@ Modified version of Ethzasl_ptam by James Lam Yi. See http://wiki.ros.org/ethzas
 
 * Improve response speed while waiting for GrabFram in calibration
 
-## Run
+## Usage
 ```
 # launch camera calibrator
 
